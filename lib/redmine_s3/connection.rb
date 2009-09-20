@@ -12,7 +12,12 @@ module RedmineS3
       @@access_key_id     = options[Rails.env]['access_key_id']
       @@secret_acces_key  = options[Rails.env]['secret_access_key']
       @@bucket            = options[Rails.env]['bucket']
-      @@uri              = "http://s3.amazonaws.com/#{@@bucket}"
+
+      if options[Rails.env]['cname_bucket'] == true
+        @@uri = "http://#{@@bucket}"
+      else
+        @@uri = "http://s3.amazonaws.com/#{@@bucket}"
+      end
     end
 
     def self.establish_connection

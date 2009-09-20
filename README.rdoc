@@ -2,12 +2,6 @@
 
 A Redmine plugin that uses Amazon S3 to store file attachments.
 
-{{{
 cp vendor/plugins/redmine_s3/config/s3.yml.example config/s3.yml
-}}}
 
 configure your config/s3.yml - you may have different settings for different rails environments.
-
-TODO
-* enable SSL
-* enable using a CNAMEd domain pointing to a bucket
