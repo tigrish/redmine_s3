@@ -4,11 +4,11 @@ module RedmineS3
     @@access_key_id     = nil
     @@secret_acces_key  = nil
     @@bucket            = nil
-    @@uri              = nil
+    @@uri               = nil
     @@conn              = nil
     
     def self.load_options
-      options = YAML::load( File.open(Rails.root +  '/config/s3.yml') )
+      options = YAML::load( File.open(Rails.root +  'config/s3.yml') )
       @@access_key_id     = options[Rails.env]['access_key_id']
       @@secret_acces_key  = options[Rails.env]['secret_access_key']
       @@bucket            = options[Rails.env]['bucket']
