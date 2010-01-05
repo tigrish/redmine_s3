@@ -28,6 +28,7 @@ Gem::Specification.new do |s|
      "lib/redmine_s3/attachments_controller_patch.rb",
      "lib/redmine_s3/connection.rb",
      "lib/s3_helper.rb",
+     "rails/init.rb",
      "test/test_helper.rb"
   ]
   s.homepage = %q{http://projects.tigrish.com/projects/redmine-s3}
