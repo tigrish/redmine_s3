@@ -12,8 +12,15 @@ This Redmine[http://www.redmine.org] plugin makes file attachments be stored on 
 
 == Options
 * The bucket specified in s3.yml will be created automatically when the plugin is loaded (this is generally when the server starts).
-* If you have created a CNAME entry for your bucket set the cname_bucket option to true in s3.yml and your files will be served from that domain. 
-* After files are uploaded they are made public. This seems acceptable as it is also Redmine's policy for file storage.
+* _Deprecated_ (specify endpoint option instead) If you have created a CNAME entry for your bucket set the cname_bucket option to true in s3.yml and your files will be served from that domain. 
+* After files are uploaded they are made public. This seems acceptable as it is also Redmine's policy for file storage.  
+* access_key_id: 
+* secret_access_key: 
+* bucket: 
+* endpoint: endpoint instead of s3.amazonaws.com
+* secure: true/false use https
+* private: true/false use private signed urls
+* verify_ssl: true/false verify with aws certificates downloaded from your s3 account
 
 == Reporting Bugs and Getting Help
 Bugs and feature requests may be filed at http://projects.tigrish.com/projects/redmine-s3/issues
