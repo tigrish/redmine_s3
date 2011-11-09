@@ -5,6 +5,7 @@ production:
   endpoint:
   secure:
   private:
+  expires: 
   verify_ssl:
 
 development:
@@ -14,4 +15,5 @@ development:
   endpoint:
   secure:
   private:
+  expires: 
   verify_ssl:

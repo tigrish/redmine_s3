@@ -14,6 +14,7 @@ module RedmineS3
         @@bucket             = options[Rails.env]['bucket']
         @@endpoint           = options[Rails.env]['endpoint']
         @@private            = options[Rails.env]['private']
+        @@expires            = options[Rails.env]['expires']
         @@secure             = options[Rails.env]['secure']
         @@verify_ssl         = options[Rails.env]['verify_ssl']
       end
@@ -72,7 +73,9 @@ module RedmineS3
       def object_url(filename)
         object = self.conn.buckets[@@bucket].objects[filename]
         if self.private?
-          object.url_for(:read, :secure => self.secure?).to_s
+          options = {:secure => self.secure?}
+          options[:expires] = @@expires unless @@expires.nil?
+          object.url_for(:read, options).to_s
         else
           object.public_url(:secure => self.secure?).to_s
         end
