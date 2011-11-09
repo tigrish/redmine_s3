@@ -40,4 +40,4 @@ module AWS
   end
 end
 
-require 'aws/rails'
+# require 'aws/rails'
