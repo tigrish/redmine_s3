@@ -21,7 +21,6 @@ module RedmineS3
         if @temp_file && (@temp_file.size > 0)
           logger.debug("Uploading to #{path_to_file}")
           RedmineS3::Connection.put(path_to_file, @temp_file.read)
-          RedmineS3::Connection.publicly_readable!(path_to_file) unless RedmineS3::Connection.private?
           md5 = Digest::MD5.new
           self.digest = md5.hexdigest
         end

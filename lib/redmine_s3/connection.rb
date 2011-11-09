@@ -59,12 +59,9 @@ module RedmineS3
         objects = self.conn.buckets[@@bucket].objects
         object = objects[filename]
         object = objects.create(filename) unless object.exists?
-        object.write(data)
-      end
-
-      def publicly_readable!(filename)
-        object = self.conn.buckets[@@bucket].objects[filename]
-        object.acl.grant(:public_read).to(:group_uri => "http://acs.amazonaws.com/groups/global/AllUsers")
+        options = {}
+        options[:acl] = :public_read unless self.private?
+        object.write(data, options)
       end
 
       def delete(filename)
