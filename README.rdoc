@@ -20,7 +20,7 @@ This Redmine[http://www.redmine.org] plugin makes file attachments be stored on 
 * endpoint: endpoint instead of s3.amazonaws.com
 * secure: true/false use https
 * private: true/false use private signed urls
-* verify_ssl: true/false verify with aws certificates downloaded from your s3 account
+* verify_ssl: true/false verify with aws cert bundle 
 
 == Reporting Bugs and Getting Help
 Bugs and feature requests may be filed at http://projects.tigrish.com/projects/redmine-s3/issues
