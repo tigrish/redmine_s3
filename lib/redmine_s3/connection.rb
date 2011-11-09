@@ -1,30 +1,31 @@
 require 'aws-sdk'
 module RedmineS3
   class Connection
-    @@access_key_id     = nil
-    @@secret_acces_key  = nil
-    @@bucket            = nil
-    @@conn              = nil
+    @@conn = nil
+    @@s3_options = {
+      :access_key_id     => nil,
+      :secret_access_key => nil,
+      :bucket            => nil,
+      :endpoint          => nil,
+      :private           => false,
+      :expires           => nil,
+      :secure            => false
+    }
     
     class << self
       def load_options
-        options = YAML::load( File.open(File.join(Rails.root, 'config', 's3.yml')) )
-        @@access_key_id      = options[Rails.env]['access_key_id']
-        @@secret_access_key  = options[Rails.env]['secret_access_key']
-        @@bucket             = options[Rails.env]['bucket']
-        @@endpoint           = options[Rails.env]['endpoint']
-        @@private            = options[Rails.env]['private']
-        @@expires            = options[Rails.env]['expires']
-        @@secure             = options[Rails.env]['secure']
+        YAML::load( File.open(File.join(Rails.root, 'config', 's3.yml')) )[Rails.env].each do |key, value|
+         @@s3_options[key.to_sym] = value
+        end
       end
 
       def establish_connection
-        load_options unless @@access_key_id && @@secret_access_key
+        load_options unless @@s3_options[:access_key_id] && @@s3_options[:secret_access_key]
         options = {
-          :access_key_id => @@access_key_id,
-          :secret_access_key => @@secret_access_key
+          :access_key_id => @@s3_options[:access_key_id],
+          :secret_access_key => @@s3_options[:secret_access_key]
         }
-        options[:s3_endpoint] = @@endpoint unless @@endpoint.nil?
+        options[:s3_endpoint] = self.endpoint unless self.endpoint.nil?
         @conn = AWS::S3.new(options)
       end
 
@@ -33,25 +34,33 @@ module RedmineS3
       end
 
       def bucket
-        load_options unless @@bucket
-        @@bucket
+        load_options unless @@s3_options[:bucket]
+        @@s3_options[:bucket]
       end
 
       def create_bucket
-        bucket = self.conn.buckets[@@bucket]
+        bucket = self.conn.buckets[self.bucket]
         bucket.create unless bucket.exists?
+      end
+
+      def endpoint
+        @@s3_options[:endpoint]
+      end
+
+      def expires
+        @@s3_options[:expires]
       end
       
       def private?
-        !!@@private
+        @@s3_options[:private]
       end
 
       def secure?
-        !!@@secure
+        @@s3_options[:secure]
       end
 
       def put(filename, data)
-        objects = self.conn.buckets[@@bucket].objects
+        objects = self.conn.buckets[self.bucket].objects
         object = objects[filename]
         object = objects.create(filename) unless object.exists?
         options = {}
@@ -60,15 +69,15 @@ module RedmineS3
       end
 
       def delete(filename)
-        object = self.conn.buckets[@@bucket].objects[filename]
+        object = self.conn.buckets[self.bucket].objects[filename]
         object.delete if object.exists?
       end
 
       def object_url(filename)
-        object = self.conn.buckets[@@bucket].objects[filename]
+        object = self.conn.buckets[self.bucket].objects[filename]
         if self.private?
           options = {:secure => self.secure?}
-          options[:expires] = @@expires unless @@expires.nil?
+          options[:expires] = self.expires unless self.expires.nil?
           object.url_for(:read, options).to_s
         else
           object.public_url(:secure => self.secure?).to_s
