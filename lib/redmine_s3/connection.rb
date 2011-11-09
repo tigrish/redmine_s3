@@ -16,15 +16,13 @@ module RedmineS3
         @@private            = options[Rails.env]['private']
         @@expires            = options[Rails.env]['expires']
         @@secure             = options[Rails.env]['secure']
-        @@verify_ssl         = options[Rails.env]['verify_ssl']
       end
 
       def establish_connection
         load_options unless @@access_key_id && @@secret_access_key
         options = {
           :access_key_id => @@access_key_id,
-          :secret_access_key => @@secret_access_key,
-          :ssl_verify_peer => self.verify_ssl? 
+          :secret_access_key => @@secret_access_key
         }
         options[:s3_endpoint] = @@endpoint unless @@endpoint.nil?
         @conn = AWS::S3.new(options)
@@ -50,10 +48,6 @@ module RedmineS3
 
       def secure?
         !!@@secure
-      end
-
-      def verify_ssl?
-        !!@@verify_ssl
       end
 
       def put(filename, data)

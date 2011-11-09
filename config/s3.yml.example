@@ -6,7 +6,6 @@ production:
   secure:
   private:
   expires: 
-  verify_ssl:
 
 development:
   access_key_id: 
@@ -16,4 +15,3 @@ development:
   secure:
   private:
   expires: 
-  verify_ssl:
