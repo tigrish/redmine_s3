@@ -2,10 +2,16 @@ production:
   access_key_id: 
   secret_access_key: 
   bucket: 
-  cname_bucket: false
+  endpoint:
+  secure:
+  private:
+  verify_ssl:
 
 development:
   access_key_id: 
   secret_access_key: 
-  bucket:
-  cname_bucket: false
+  bucket: 
+  endpoint:
+  secure:
+  private:
+  verify_ssl:
