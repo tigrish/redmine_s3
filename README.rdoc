@@ -19,9 +19,9 @@ This Redmine[http://www.redmine.org] plugin makes file attachments be stored on 
 * Private file urls can expire a set time after the links were generated using the expires option
 
 == Options Detail
-* access_key_id: string key
-* secret_access_key: string key 
-* bucket: string bucket name 
+* access_key_id: string key (required)
+* secret_access_key: string key (required)
+* bucket: string bucket name (required)
 * endpoint: string endpoint instead of s3.amazonaws.com
 * secure: boolean true/false 
 * private: boolean true/false
