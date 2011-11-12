@@ -29,4 +29,4 @@ This Redmine[http://www.redmine.org] plugin makes file attachments be stored on 
 * Defaults to private: false, secure: false, default endpoint, and default expires
 
 == Reporting Bugs and Getting Help
-Bugs and feature requests may be filed at http://projects.tigrish.com/projects/redmine-s3/issues
+Bugs and feature requests may be filed at https://github.com/tigrish/redmine_s3/issues
