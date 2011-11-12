@@ -19,9 +19,8 @@ module RedmineS3
     module InstanceMethods
       def put_to_s3
         if @temp_file && (@temp_file.size > 0)
-          logger.debug("Uploading to #{RedmineS3::Connection.uri}/#{path_to_file}")
+          logger.debug("Uploading to #{path_to_file}")
           RedmineS3::Connection.put(path_to_file, @temp_file.read)
-          RedmineS3::Connection.publicly_readable!(path_to_file)
           md5 = Digest::MD5.new
           self.digest = md5.hexdigest
         end
@@ -29,7 +28,7 @@ module RedmineS3
       end
 
       def delete_from_s3
-        logger.debug("Deleting #{RedmineS3::Connection.uri}/#{path_to_file}")
+        logger.debug("Deleting #{path_to_file}")
         RedmineS3::Connection.delete(path_to_file)
       end
 

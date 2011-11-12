@@ -20,7 +20,7 @@ module RedmineS3
         if @attachment.container.is_a?(Version) || @attachment.container.is_a?(Project)
           @attachment.increment_download
         end
-        redirect_to("#{RedmineS3::Connection.uri}/#{@attachment.path_to_file}")
+        redirect_to(RedmineS3::Connection.object_url(@attachment.path_to_file))
       end
     end
   end

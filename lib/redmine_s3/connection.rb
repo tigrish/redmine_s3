@@ -1,60 +1,88 @@
-require 'S3'
+require 'aws-sdk'
 module RedmineS3
   class Connection
-    @@access_key_id     = nil
-    @@secret_acces_key  = nil
-    @@bucket            = nil
-    @@uri               = nil
-    @@conn              = nil
+    @@conn = nil
+    @@s3_options = {
+      :access_key_id     => nil,
+      :secret_access_key => nil,
+      :bucket            => nil,
+      :endpoint          => nil,
+      :private           => false,
+      :expires           => nil,
+      :secure            => false
+    }
     
-    def self.load_options
-      options = YAML::load( File.open(File.join(Rails.root, 'config', 's3.yml')) )
-      @@access_key_id     = options[Rails.env]['access_key_id']
-      @@secret_acces_key  = options[Rails.env]['secret_access_key']
-      @@bucket            = options[Rails.env]['bucket']
-
-      if options[Rails.env]['cname_bucket'] == true
-        @@uri = "http://#{@@bucket}"
-      else
-        @@uri = "http://s3.amazonaws.com/#{@@bucket}"
+    class << self
+      def load_options
+        YAML::load( File.open(File.join(Rails.root, 'config', 's3.yml')) )[Rails.env].each do |key, value|
+         @@s3_options[key.to_sym] = value
+        end
       end
-    end
 
-    def self.establish_connection
-      load_options unless @@access_key_id && @@secret_acces_key
-      @@conn = S3::AWSAuthConnection.new(@@access_key_id, @@secret_acces_key, false)
-    end
+      def establish_connection
+        load_options unless @@s3_options[:access_key_id] && @@s3_options[:secret_access_key]
+        options = {
+          :access_key_id => @@s3_options[:access_key_id],
+          :secret_access_key => @@s3_options[:secret_access_key]
+        }
+        options[:s3_endpoint] = self.endpoint unless self.endpoint.nil?
+        @conn = AWS::S3.new(options)
+      end
 
-    def self.conn
-      @@conn || establish_connection
-    end
+      def conn
+        @@conn || establish_connection
+      end
 
-    def self.bucket
-      load_options unless @@bucket
-      @@bucket
-    end
+      def bucket
+        load_options unless @@s3_options[:bucket]
+        @@s3_options[:bucket]
+      end
 
-    def self.uri
-      load_options unless @@uri
-      @@uri
-    end
+      def create_bucket
+        bucket = self.conn.buckets[self.bucket]
+        bucket.create unless bucket.exists?
+      end
 
-    def self.create_bucket
-      conn.create_bucket(bucket).http_response.message
-    end
+      def endpoint
+        @@s3_options[:endpoint]
+      end
 
-    def self.put(filename, data)
-      conn.put(bucket, filename, data)
-    end
+      def expires
+        @@s3_options[:expires]
+      end
+      
+      def private?
+        @@s3_options[:private]
+      end
 
-    def self.publicly_readable!(filename)
-      acl_xml = conn.get_acl(bucket, filename).object.data
-      updated_acl = S3Helper.set_acl_public_read(acl_xml)
-      conn.put_acl(bucket, filename, updated_acl).http_response.message
-    end
+      def secure?
+        @@s3_options[:secure]
+      end
 
-    def self.delete(filename)
-      conn.delete(bucket, filename)
+      def put(filename, data)
+        objects = self.conn.buckets[self.bucket].objects
+        object = objects[filename]
+        object = objects.create(filename) unless object.exists?
+        options = {}
+        options[:acl] = :public_read unless self.private?
+        object.write(data, options)
+      end
+
+      def delete(filename)
+        object = self.conn.buckets[self.bucket].objects[filename]
+        object.delete if object.exists?
+      end
+
+      def object_url(filename)
+        object = self.conn.buckets[self.bucket].objects[filename]
+        if self.private?
+          options = {:secure => self.secure?}
+          options[:expires] = self.expires unless self.expires.nil?
+          object.url_for(:read, options).to_s
+        else
+          object.public_url(:secure => self.secure?).to_s
+        end
+      end
     end
   end
 end
