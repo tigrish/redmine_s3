@@ -14,7 +14,8 @@ module RedmineS3
     
     class << self
       def load_options
-        YAML::load( File.open(File.join(Rails.root, 'config', 's3.yml')) )[Rails.env].each do |key, value|
+        file = ERB.new( File.read(File.join(Rails.root, 'config', 's3.yml')) ).result
+        YAML::load( file )[Rails.env].each do |key, value|
          @@s3_options[key.to_sym] = value
         end
       end
